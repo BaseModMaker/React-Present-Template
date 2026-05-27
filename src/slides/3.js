@@ -1,190 +1,449 @@
 import createThreeSlide from '../three/createThreeSlide.js';
 
+let state = {};
+
+const vw = (value) => `${value}vw`;
+const vh = (value) => `${value}vh`;
+
 export default createThreeSlide({
   steps: [
-    ({ THREE, add, tween, camera }) => {
-      const axisLength = 4;
+    (api) => {
+      const { el, addHtml } = api;
 
-      // Isometric-like camera view:
-      // X -> bottom right, Y -> up, Z -> bottom left
-      camera.position.set(6, 6, 6);
-      camera.lookAt(0, 0, 0);
+      addHtml(el('h2', {
+        margin: '0 0 28px',
+        fontSize: '38px',
+        color: 'rgb(0, 191, 255)',
+        position: 'fixed',
+        left: '3%',
+        top: '3%',
+        transform: 'translateX(-50%)',
+      }, '2. The non-resumable model'));
 
-      function createTextSprite(text, color) {
-        const canvas = document.createElement('canvas');
-        const size = 128;
-        canvas.width = size;
-        canvas.height = size;
+      state = {};
 
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, size, size);
-        ctx.font = 'bold 64px Arial';
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, size / 2, size / 2);
+      const panel = el('div', {
+        position: 'relative',
+        width: '94vw',
+        height: '72vh',
+        overflow: 'hidden',
+        color: '#666',
+      });
 
-        const texture = new THREE.CanvasTexture(canvas);
-        const material = new THREE.SpriteMaterial({
-          map: texture,
-          transparent: true,
-          opacity: 0,
+      state.panel = panel;
+      addHtml(panel);
+
+      const title = el('div', {
+        position: 'absolute',
+        top: vh(3.2),
+        left: '0',
+        width: '100%',
+        textAlign: 'center',
+        fontSize: '2.45vw',
+        fontWeight: '800',
+        letterSpacing: '0.05vw',
+        color: 'white',
+      }, 'Starting Delay vs Resuming Delay');
+
+      panel.appendChild(title);
+      state.title = title;
+
+      function addLine(styles, parent = panel) {
+        const line = el('div', {
+          position: 'absolute',
+          background: '#666',
+          ...styles,
         });
 
-        const sprite = new THREE.Sprite(material);
-        sprite.scale.set(0.45, 0.45, 0.45);
-
-        return sprite;
+        parent.appendChild(line);
+        return line;
       }
 
-      function createAxis(color, direction) {
-        // Root object at origin so scaling makes it grow from the origin
-        const axisRoot = new THREE.Group();
+      function addText(text, styles, parent = panel) {
+        const label = el('div', {
+          position: 'absolute',
+          fontSize: '1.35vw',
+          fontWeight: '700',
+          color: '#666',
+          whiteSpace: 'pre-line',
+          ...styles,
+        }, text);
 
-        const geometry = new THREE.CylinderGeometry(0.025, 0.025, axisLength, 16);
-        const material = new THREE.MeshBasicMaterial({ color });
-        const axisMesh = new THREE.Mesh(geometry, material);
-
-        // Cylinder is centered, so move it half its length upward in local space
-        axisMesh.position.y = axisLength / 2;
-        axisRoot.add(axisMesh);
-
-        // Rotate local Y to target direction
-        const yAxis = new THREE.Vector3(0, 1, 0);
-        axisRoot.quaternion.setFromUnitVectors(yAxis, direction.clone().normalize());
-
-        // Start almost invisible and grow
-        axisRoot.scale.y = 0.001;
-
-        add(axisRoot);
-
-        return axisRoot;
+        parent.appendChild(label);
+        return label;
       }
 
-      const xAxis = createAxis(0xff4444, new THREE.Vector3(1, 0, 0));
-      const yAxis = createAxis(0x00ff00, new THREE.Vector3(0, 1, 0));
-      const zAxis = createAxis(0x4488ff, new THREE.Vector3(0, 0, 1));
+      function addArrowHead(left, top, rotation = 0, color = '#666', parent = panel) {
+        const head = el('div', {
+          position: 'absolute',
+          left: vw(left),
+          top: vh(top),
+          width: '0',
+          height: '0',
+          borderTop: '0.45vh solid transparent',
+          borderBottom: '0.45vh solid transparent',
+          borderLeft: `0.8vw solid ${color}`,
+          transform: `rotate(${rotation}deg)`,
+        });
 
-      tween({
-        duration: 1000,
-        onUpdate(progress) {
-          xAxis.scale.y = progress;
-          yAxis.scale.y = progress;
-          zAxis.scale.y = progress;
-        },
-        onComplete() {
-          const xLabel = createTextSprite('X', '#ff4444');
-          const yLabel = createTextSprite('Y', '#00ff00');
-          const zLabel = createTextSprite('Z', '#4488ff');
+        parent.appendChild(head);
+        return head;
+      }
 
-          xLabel.position.set(axisLength + 0.35, 0, 0);
-          yLabel.position.set(0, axisLength + 0.35, 0);
-          zLabel.position.set(0, 0, axisLength + 0.35);
+      function addBracket({ left, top, width, color = '#666', label }) {
+        addLine({
+          left: vw(left),
+          top: vh(top),
+          width: vw(width),
+          height: vh(0.22),
+          background: color,
+        });
 
-          add(xLabel);
-          add(yLabel);
-          add(zLabel);
+        addLine({
+          left: vw(left),
+          top: vh(top - 1.25),
+          width: vw(0.12),
+          height: vh(2.5),
+          background: color,
+        });
 
-          tween({
-            duration: 600,
-            onUpdate(progress) {
-              xLabel.material.opacity = progress;
-              yLabel.material.opacity = progress;
-              zLabel.material.opacity = progress;
-            },
-          });
-        },
+        addLine({
+          left: vw(left + width),
+          top: vh(top - 1.25),
+          width: vw(0.12),
+          height: vh(2.5),
+          background: color,
+        });
+
+        addText(label, {
+          left: vw(left + width * 0.25),
+          top: vh(top - 5),
+          color,
+          fontSize: '1.45vw',
+          fontWeight: '400',
+        });
+      }
+
+      state.helpers = {
+        addLine,
+        addText,
+        addArrowHead,
+        addBracket,
+      };
+
+      // X axis
+      addLine({
+        left: vw(7),
+        top: vh(43),
+        width: vw(84),
+        height: vh(0.25),
+      });
+
+      addArrowHead(91, 42.58, 0);
+
+      // Y axis
+      addLine({
+        left: vw(9),
+        top: vh(13),
+        width: vw(0.14),
+        height: vh(43),
+      });
+
+      addArrowHead(8.65, 12.2, -90);
+
+      addText('τ₁', {
+        left: vw(4.5),
+        top: vh(35),
+        fontSize: '1.75vw',
+        fontWeight: '500',
+        color: 'white',
+      });
+
+      addText('ms', {
+        right: vw(1),
+        top: vh(51),
+        fontSize: '1.75vw',
+        fontWeight: '700',
+        color: '#666',
+      });
+
+      state.addBlock = function addBlock({
+        label,
+        left,
+        top = 33.5,
+        width,
+        height = 9.5,
+        fill,
+        border,
+        color = 'black',
+        delay = 0,
+      }) {
+        const block = el('div', {
+          position: 'absolute',
+          left: vw(left),
+          top: vh(top),
+          width: vw(width),
+          height: vh(height),
+          background: fill,
+          border: `0.14vw solid ${border}`,
+          color,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          fontSize: '1.55vw',
+          fontWeight: '500',
+          lineHeight: '1.15',
+          whiteSpace: 'pre-line',
+          opacity: '0',
+          transform: 'translateY(2vh)',
+          transition: 'all 700ms cubic-bezier(.2,.8,.2,1)',
+          boxSizing: 'border-box',
+        }, label);
+
+        panel.appendChild(block);
+
+        window.setTimeout(() => {
+          block.style.opacity = '1';
+          block.style.transform = 'translateY(0)';
+        }, delay);
+
+        return block;
+      };
+
+      state.labels = {
+        release: addText('release', {
+          left: vw(8),
+          top: vh(51),
+          fontSize: '1.55vw',
+          color: '#666',
+          opacity: '0',
+          transition: 'opacity 450ms ease',
+        }),
+
+        preempted: addText('preempted', {
+          left: vw(30),
+          top: vh(51),
+          fontSize: '1.55vw',
+          color: '#666',
+          opacity: '0',
+          transition: 'opacity 450ms ease',
+        }),
+
+        resumed: addText('resumed', {
+          left: vw(50),
+          top: vh(51),
+          fontSize: '1.55vw',
+          color: '#666',
+          opacity: '0',
+          transition: 'opacity 450ms ease',
+        }),
+
+        completion: addText('completion', {
+          left: vw(79),
+          top: vh(51),
+          fontSize: '1.55vw',
+          color: '#666',
+          opacity: '0',
+          transition: 'opacity 450ms ease',
+        }),
+      };
+
+      state.startingDelay = state.addBlock({
+        label: 'starting delay',
+        left: 18,
+        width: 13,
+        fill: '#eeeeee',
+        border: '#999',
+        delay: 0,
+      });
+
+      state.firstExecution = state.addBlock({
+        label: 'first\nexecution',
+        left: 31,
+        width: 12,
+        fill: '#dceecf',
+        border: '#6d8f63',
+        delay: 220,
+      });
+
+      state.resumingDelay = state.addBlock({
+        label: 'resuming\ndelay',
+        left: 47,
+        width: 10,
+        fill: '#fff1cf',
+        border: '#a67c18',
+        delay: 440,
+      });
+
+      state.continuedExecution = state.addBlock({
+        label: 'continued execution',
+        left: 57,
+        width: 32,
+        fill: '#dceecf',
+        border: '#6d8f63',
+        delay: 660,
       });
     },
 
-    ({ THREE, add, tween }) => {
-      const width = 4;
-      const depth = 4;
-      const segments = 40;
+    () => {
+      const { helpers, labels } = state;
+      const { addLine, addArrowHead, addBracket } = helpers;
 
-      const geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
-      geometry.rotateX(-Math.PI / 2);
-
-      const positions = geometry.attributes.position;
-
-      for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i);
-        const z = positions.getZ(i);
-
-        const distance = Math.sqrt(x * x + z * z);
-        const y = Math.sin(distance * 3) * 0.35;
-
-        positions.setY(i, y);
-      }
-
-      positions.needsUpdate = true;
-      geometry.computeVertexNormals();
-
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x44aaff,
-        transparent: true,
-        opacity: 0,
-        wireframe: true,
+      Object.values(labels).forEach((label) => {
+        label.style.opacity = '1';
       });
 
-      const surface = new THREE.Mesh(geometry, material);
+      // Release vertical marker
+      addLine({
+        left: vw(18),
+        top: vh(27),
+        width: vw(0.14),
+        height: vh(16),
+        background: '#666',
+      });
 
-      surface.position.set(2, 0, 2);
-      surface.scale.setScalar(0.001);
+      addArrowHead(17.65, 26.2, -90, '#666');
 
-      add(surface);
+      // Resumed vertical marker
+      addLine({
+        left: vw(57),
+        top: vh(27),
+        width: vw(0.14),
+        height: vh(16),
+        background: '#666',
+      });
 
-      tween({
-        duration: 1200,
-        onUpdate(progress) {
-          surface.scale.setScalar(progress);
-          material.opacity = progress;
-        },
+      addArrowHead(56.65, 26.2, -90, '#666');
+
+      // End marker
+      addLine({
+        left: vw(89),
+        top: vh(35),
+        width: vw(0.14),
+        height: vh(8),
+        background: '#666',
+      });
+
+      addBracket({
+        left: 18,
+        top: 19,
+        width: 25,
+        color: '#777',
+        label: 'first execution',
+      });
+
+      addBracket({
+        left: 47,
+        top: 19,
+        width: 42,
+        color: '#9a6700',
+        label: 'second execution',
       });
     },
 
-    ({ THREE, add, tween }) => {
-      const points = [
-        { x: 0.3, z: 0.6 },
-        { x: 0.8, z: 1.4 },
-        { x: 1.4, z: 2.1 },
-        { x: 2.0, z: 0.9 },
-        { x: 2.7, z: 2.5 },
-        { x: 3.3, z: 1.6 },
-      ];
+    (api) => {
+      const { el } = api;
+      const { panel, helpers } = state;
+      const { addLine, addArrowHead, addText } = helpers;
 
-      points.forEach((point, index) => {
-        setTimeout(() => {
-          const distance = Math.sqrt(
-            (point.x - 2) * (point.x - 2) +
-            (point.z - 2) * (point.z - 2)
-          );
+      const annotationLayer = el('div', {
+        position: 'absolute',
+        inset: '0',
+        opacity: '0',
+        transition: 'opacity 500ms ease',
+      });
 
-          const y = Math.sin(distance * 3) * 0.35;
+      panel.appendChild(annotationLayer);
 
-          const geometry = new THREE.SphereGeometry(0.1, 24, 24);
-          const material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0,
-          });
+      requestAnimationFrame(() => {
+        annotationLayer.style.opacity = '1';
+      });
 
-          const sphere = new THREE.Mesh(geometry, material);
+      function text(text, styles) {
+        return addText(text, styles, annotationLayer);
+      }
 
-          sphere.position.set(point.x, 0, point.z);
-          sphere.scale.setScalar(0.001);
+      function line(styles) {
+        return addLine(styles, annotationLayer);
+      }
 
-          add(sphere);
+      function arrow(left, top, rotation = 0, color = '#666') {
+        return addArrowHead(left, top, rotation, color, annotationLayer);
+      }
 
-          tween({
-            duration: 600,
-            onUpdate(progress) {
-              sphere.position.y = y * progress;
-              sphere.scale.setScalar(progress);
-              material.opacity = progress;
-            },
-          });
-        }, index * 200);
+      line({
+        left: vw(43),
+        top: vh(27.5),
+        width: vw(0.14),
+        height: vh(15.5),
+        background: '#aa5555',
+      });
+
+      arrow(42.65, 42.55, 90, '#aa5555');
+
+      // Delay emphasis under blocks
+      line({
+        left: vw(18),
+        top: vh(46),
+        width: vw(13),
+        height: vh(0.22),
+        background: '#999',
+      });
+
+      line({
+        left: vw(47),
+        top: vh(46),
+        width: vw(10),
+        height: vh(0.22),
+        background: '#9a6700',
+      });
+
+      text('Examples:\n- loading task state\n- initialization\n- security check', {
+        left: vw(19),
+        top: vh(47),
+        color: '#999',
+        fontSize: '1.7vw',
+        fontWeight: '700',
+        background: '#181a1d',
+      });
+
+      text('Examples:\n- restoring context\n- reloading resources\n- validating state', {
+        left: vw(47.2),
+        top: vh(47),
+        color: '#9a6700',
+        fontSize: '1.7vw',
+        fontWeight: '700',
+        background: '#181a1d',
+      });
+    },
+
+    // add a pill-shaped highlight that says Some operations must restart if they are interrupted
+    (api) => {
+      const { el } = api;
+      const { panel } = state;
+
+      const highlight = el('div', {
+        position: 'absolute',
+        left: vw(24),
+        top: vh(65),
+        padding: '0.8vh 1.2vw',
+        background: 'rgba(101, 116, 255, 0.9)',
+        border: '2px solid rgb(34, 0, 255)',
+        borderRadius: '999px',
+        color: '#ffffff',
+        fontSize: '1.55vw',
+        fontWeight: '700',
+        opacity: '0',
+        transform: 'translateY(-2vh)',
+        transition: 'all 700ms cubic-bezier(.2,.8,.2,1)',
+      }, 'Some operations must restart if they are interrupted');
+
+      panel.appendChild(highlight);
+
+      requestAnimationFrame(() => {
+        highlight.style.opacity = '1';
+        highlight.style.transform = 'translateY(0)';
       });
     },
   ],

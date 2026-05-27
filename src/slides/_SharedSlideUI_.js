@@ -14,7 +14,7 @@ function SharedSlideUI({ currentSlide, totalSlides }) {
   return (
     <div className="shared-slide-ui">
       <header className="slide-header">
-        <span>My Presentation</span>
+        <span> </span>
         <span>
           {currentSlide} / {totalSlides}
         </span>

@@ -2,36 +2,48 @@ import createThreeSlide from '../three/createThreeSlide.js';
 
 export default createThreeSlide({
   steps: [
-    ({ spawnBall, animate }) => {
-      const ball = spawnBall({
-        color: 0xff0000,
-        x: -2,
-        fadeIn: true,
+    ({ el, addHtml, image }) => {
+      const seal = image('/ulb_seal.png', {
+        position: 'absolute',
+        right: '-80px',
+        bottom: '-120px',
+        width: '520px',
+        opacity: '0.13',
+        transform: 'rotate(-45deg)',
       });
 
-      animate(() => {
-        ball.rotation.y += 0.03;
-      });
-    },
+      addHtml(seal, undefined, { fadeIn: false });
 
-    ({ spawnBall, animate }) => {
-      const ball = spawnBall({
-        color: 0x00ff00,
-        x: 0,
-        fadeIn: true,
-      });
+      addHtml(el('h1', {
+        maxWidth: '980px',
+        margin: '0',
+        fontSize: '52px',
+        lineHeight: '1.02',
+      }, 'Practical Evaluation of the Non-Resumable Model'));
 
-      animate(() => {
-        ball.position.y = Math.sin(Date.now() * 0.003) * 0.5;
-      });
-    },
+      addHtml(el('div', {
+        marginTop: '18px',
+        fontSize: '28px',
+        opacity: '0.88',
+      }, 'A feasibility study on real operating systems and hardware'));
 
-    ({ spawnBall }) => {
-      spawnBall({
-        color: 0x0000ff,
-        x: 2,
-        fadeIn: true,
-      });
+      addHtml(el('div', {
+        width: '100%',
+        height: '3px',
+        margin: '28px 0',
+        background: 'rgb(0, 191, 255)',
+      }));
+
+      addHtml(el('div', {
+        fontSize: '24px',
+        marginTop: '18px',
+      }, 'Basile Donnay'));
+
+      addHtml(el('div', {
+        fontSize: '20px',
+        color: 'rgb(0, 191, 255)',
+        marginTop: '10px',
+      }, 'Supervisor: Joël Goossens — MEMO-F-403'));
     },
   ],
 });
