@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import SharedSlideUI, { backgroundColor } from './slides/_SharedSlideUI_.js';
+import SharedSlideUI, { backgroundColor, fontFamily } from './slides/_SharedSlideUI_.js';
 import usePresentationInputs from './inputs.js';
 import useUrlSlideSync, { getSlideIndexFromUrl } from './urlSlideSync.js';
 
@@ -24,13 +24,16 @@ function App() {
   useEffect(() => {
     const previousHtmlBackground = document.documentElement.style.backgroundColor;
     const previousBodyBackground = document.body.style.backgroundColor;
+    const previousFontFamily = document.body.style.fontFamily;
 
     document.documentElement.style.backgroundColor = backgroundColor;
     document.body.style.backgroundColor = backgroundColor;
+    document.body.style.fontFamily = fontFamily;
 
     return () => {
       document.documentElement.style.backgroundColor = previousHtmlBackground;
       document.body.style.backgroundColor = previousBodyBackground;
+      document.body.style.fontFamily = previousFontFamily;
     };
   }, []);
 
