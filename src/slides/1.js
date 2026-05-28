@@ -3,12 +3,16 @@ import createThreeSlide from '../three/createThreeSlide.js';
 export default createThreeSlide({
   steps: [
     ({ el, addHtml, image }) => {
-      const seal = image('/ulb_seal.png', {
+      const publicPath = process.env.PUBLIC_URL || '';
+      const seal = image(`${publicPath}/ulb_seal.png`, {
         position: 'absolute',
-        right: '-80px',
-        bottom: '-120px',
-        width: '520px',
-        opacity: '0.13',
+        right: '-200px',
+        bottom: '-220px',
+        width: '920px',
+        height: '920px',
+        maxWidth: '920px',
+        maxHeight: '920px',
+        opacity: '1',
         transform: 'rotate(-45deg)',
       });
 
@@ -31,7 +35,8 @@ export default createThreeSlide({
         width: '100%',
         height: '3px',
         margin: '28px 0',
-        background: 'rgb(0, 191, 255)',
+        // background: 'rgb(0, 191, 255)',
+        background: '#3059ab',
       }));
 
       addHtml(el('div', {
@@ -41,7 +46,7 @@ export default createThreeSlide({
 
       addHtml(el('div', {
         fontSize: '20px',
-        color: 'rgb(0, 191, 255)',
+        color: '#3059ab',
         marginTop: '10px',
       }, 'Supervisor: Joël Goossens — MEMO-F-403'));
     },

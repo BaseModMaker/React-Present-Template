@@ -6,11 +6,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '4. Objectives of the project'));
 
       addHtml(el('div', {
@@ -31,16 +32,16 @@ export default createThreeSlide({
       metrics.style.marginTop = '34px';
 
       metrics.appendChild(card('Implement', 'Build a prototype that enforces restart-on-preemption semantics.', {
-        minHeight: '180px',
+        minHeight: '180px', fill: 'rgb(246, 250, 255)', borderColor: 'rgb(91, 140, 201)',
       }));
 
       metrics.appendChild(card('Measure', 'Quantify preemption latency, restart cost, WCRT, and jitter.', {
-        fill: 'rgb(255, 241, 207)',
+        fill: 'rgb(255, 241, 207)', borderColor: 'rgb(255, 166, 0)',
         minHeight: '180px',
       }));
 
       metrics.appendChild(card('Compare', 'Compare real measurements with classical scheduling behavior.', {
-        fill: 'rgb(239, 255, 241)',
+        fill: 'rgb(239, 255, 241)', borderColor: 'rgb(0, 177, 21)',
         minHeight: '180px',
       }));
 
@@ -53,7 +54,7 @@ export default createThreeSlide({
         'Which platform and implementation strategy is most realistic?',
         'Which sources of variability matter most in practice?',
         'How far are measured costs from the theoretical model?',
-      ], { fill: 'rgb(246, 250, 255)' });
+      ], { fill: 'rgb(246, 250, 255)', borderColor: 'rgb(91, 140, 201)' });
 
       questions.style.marginTop = '34px';
 

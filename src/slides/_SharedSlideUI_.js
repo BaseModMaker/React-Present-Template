@@ -1,9 +1,11 @@
 import './_SharedSlideUI_.css';
 
-export const backgroundColor = 'rgb(24, 26, 29)';
-export const lightblue = 'rgb(0, 191, 255)';
+export const backgroundColor = 'rgb(255, 255, 255)';
+export const blue = '#3059ab';
 // set font to roboto mono for all slides
-export const fontFamily = '"Roboto Mono", monospace';
+// export const fontFamily = '"Roboto Mono", monospace';
+// set font to fira sans for all slides
+export const fontFamily = '"Times New Roman", serif';
 
 function SharedSlideUI({ currentSlide, totalSlides }) {
   const progress =
@@ -13,7 +15,7 @@ function SharedSlideUI({ currentSlide, totalSlides }) {
 
   return (
     <div className="shared-slide-ui">
-      <header className="slide-header">
+      <header className="slide-header" style={{ background: blue }}>
         <span> </span>
         <span>
           {currentSlide} / {totalSlides}
@@ -25,7 +27,7 @@ function SharedSlideUI({ currentSlide, totalSlides }) {
           className="slide-progress-bar-fill"
           style={{
             width: `${progress}%`,
-            background: lightblue,
+            background: blue,
           }}
         />
       </div>

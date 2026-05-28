@@ -13,11 +13,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '2. The non-resumable model'));
 
       state = {};
@@ -27,7 +28,7 @@ export default createThreeSlide({
         width: '94vw',
         height: '72vh',
         overflow: 'hidden',
-        color: '#666',
+        color: '#000000',
       });
 
       state.panel = panel;
@@ -42,7 +43,6 @@ export default createThreeSlide({
         fontSize: '2.45vw',
         fontWeight: '800',
         letterSpacing: '0.05vw',
-        color: 'white',
       }, 'Starting Delay vs Resuming Delay');
 
       panel.appendChild(title);
@@ -51,7 +51,7 @@ export default createThreeSlide({
       function addLine(styles, parent = panel) {
         const line = el('div', {
           position: 'absolute',
-          background: '#666',
+          background: '#000000',
           ...styles,
         });
 
@@ -64,7 +64,7 @@ export default createThreeSlide({
           position: 'absolute',
           fontSize: '1.35vw',
           fontWeight: '700',
-          color: '#666',
+          color: '#000000',
           whiteSpace: 'pre-line',
           ...styles,
         }, text);
@@ -73,7 +73,7 @@ export default createThreeSlide({
         return label;
       }
 
-      function addArrowHead(left, top, rotation = 0, color = '#666', parent = panel) {
+      function addArrowHead(left, top, rotation = 0, color = '#000000', parent = panel) {
         const head = el('div', {
           position: 'absolute',
           left: vw(left),
@@ -90,7 +90,7 @@ export default createThreeSlide({
         return head;
       }
 
-      function addBracket({ left, top, width, color = '#666', label }) {
+      function addBracket({ left, top, width, color = '#000000', label }) {
         addLine({
           left: vw(left),
           top: vh(top),
@@ -156,7 +156,6 @@ export default createThreeSlide({
         top: vh(35),
         fontSize: '1.75vw',
         fontWeight: '500',
-        color: 'white',
       });
 
       addText('ms', {
@@ -164,7 +163,7 @@ export default createThreeSlide({
         top: vh(51),
         fontSize: '1.75vw',
         fontWeight: '700',
-        color: '#666',
+        color: '#000000',
       });
 
       state.addBlock = function addBlock({
@@ -216,7 +215,7 @@ export default createThreeSlide({
           left: vw(8),
           top: vh(51),
           fontSize: '1.55vw',
-          color: '#666',
+          color: '#000000',
           opacity: '0',
           transition: 'opacity 450ms ease',
         }),
@@ -225,7 +224,7 @@ export default createThreeSlide({
           left: vw(30),
           top: vh(51),
           fontSize: '1.55vw',
-          color: '#666',
+          color: '#000000',
           opacity: '0',
           transition: 'opacity 450ms ease',
         }),
@@ -234,7 +233,7 @@ export default createThreeSlide({
           left: vw(50),
           top: vh(51),
           fontSize: '1.55vw',
-          color: '#666',
+          color: '#000000',
           opacity: '0',
           transition: 'opacity 450ms ease',
         }),
@@ -243,7 +242,7 @@ export default createThreeSlide({
           left: vw(79),
           top: vh(51),
           fontSize: '1.55vw',
-          color: '#666',
+          color: '#000000',
           opacity: '0',
           transition: 'opacity 450ms ease',
         }),
@@ -300,10 +299,10 @@ export default createThreeSlide({
         top: vh(27),
         width: vw(0.14),
         height: vh(16),
-        background: '#666',
+        background: '#000000',
       });
 
-      addArrowHead(17.65, 26.2, -90, '#666');
+      addArrowHead(17.65, 26.2, -90, '#000000');
 
       // Resumed vertical marker
       addLine({
@@ -311,10 +310,10 @@ export default createThreeSlide({
         top: vh(27),
         width: vw(0.14),
         height: vh(16),
-        background: '#666',
+        background: '#000000',
       });
 
-      addArrowHead(56.65, 26.2, -90, '#666');
+      addArrowHead(56.65, 26.2, -90, '#000000');
 
       // End marker
       addLine({
@@ -322,7 +321,7 @@ export default createThreeSlide({
         top: vh(35),
         width: vw(0.14),
         height: vh(8),
-        background: '#666',
+        background: '#000000',
       });
 
       addBracket({
@@ -368,7 +367,7 @@ export default createThreeSlide({
         return addLine(styles, annotationLayer);
       }
 
-      function arrow(left, top, rotation = 0, color = '#666') {
+      function arrow(left, top, rotation = 0, color = '#000000') {
         return addArrowHead(left, top, rotation, color, annotationLayer);
       }
 
@@ -405,7 +404,7 @@ export default createThreeSlide({
         color: '#999',
         fontSize: '1.7vw',
         fontWeight: '700',
-        background: '#181a1d',
+        background: '#ffffff',
       });
 
       text('Examples:\n- restoring context\n- reloading resources\n- validating state', {
@@ -414,7 +413,7 @@ export default createThreeSlide({
         color: '#9a6700',
         fontSize: '1.7vw',
         fontWeight: '700',
-        background: '#181a1d',
+        background: '#ffffff',
       });
     },
 

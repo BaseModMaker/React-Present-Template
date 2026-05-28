@@ -6,11 +6,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '3. What is known, and what is missing'));
 
       const comparison = grid('1fr auto 1fr');
@@ -22,11 +23,11 @@ export default createThreeSlide({
         'response-time bounds',
         'starting/resuming delay models',
         'more realistic preemption costs',
-      ], { fill: 'rgb(239, 255, 241)' }));
+      ], { fill: 'rgb(239, 255, 241)', borderColor: 'rgb(0, 177, 21)' }));
 
       comparison.appendChild(el('div', {
         fontSize: '58px',
-        color: 'rgb(0, 191, 255)',
+        color: '#3059ab',
         fontWeight: '800',
       }, '→'));
 
@@ -36,7 +37,7 @@ export default createThreeSlide({
         'user-space vs kernel implementation',
         'difference between measured and predicted costs',
         'practical feasibility',
-      ], { fill: 'rgb(255, 230, 230)' }));
+      ], { fill: 'rgb(255, 230, 230)', borderColor: 'rgb(255, 0, 0)' }));
 
       addHtml(comparison);
     },

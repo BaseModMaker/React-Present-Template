@@ -6,11 +6,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '5. Project plan'));
 
       const plan = grid('repeat(3, minmax(0, 1fr))');
@@ -20,27 +21,27 @@ export default createThreeSlide({
         'Linux PREEMPT_RT',
         'bare-metal reference',
         'virtual machines only for exploration',
-      ]));
+      ], { fill: 'rgb(246, 250, 255)', borderColor: 'rgb(91, 140, 201)' }));
 
       plan.appendChild(card('Workloads', [
         'mixed periodic/aperiodic tasks',
         'different interruption points',
         'light and heavy load',
-      ], { fill: 'rgb(255, 241, 207)' }));
+      ], { fill: 'rgb(255, 241, 207)', borderColor: 'rgb(255, 166, 0)' }));
 
       plan.appendChild(card('Measurements', [
         'ftrace / cyclictest on Linux',
         'hardware timers on RTOS',
         'GPIO + oscilloscope if possible',
         'repeated runs under controlled conditions',
-      ], { fill: 'rgb(239, 255, 241)' }));
+      ], { fill: 'rgb(239, 255, 241)', borderColor: 'rgb(0, 177, 21)' }));
 
       addHtml(plan);
     },
 
     ({ el, addHtml }) => {
       addHtml(el('div', {
-        border: '2px solid rgb(0, 191, 255)',
+        border: '2px solid #3059ab',
         borderRadius: '18px',
         padding: '22px',
         fontSize: '24px',

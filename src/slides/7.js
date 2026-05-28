@@ -6,11 +6,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '6. Expected contribution and deliverables'));
 
       const layout = grid('1.2fr 1fr');

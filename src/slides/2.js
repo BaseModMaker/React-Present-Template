@@ -13,11 +13,12 @@ export default createThreeSlide({
       addHtml(el('h2', {
         margin: '0 0 28px',
         fontSize: '38px',
-        color: 'rgb(0, 191, 255)',
+        color: '#ffffff',
         position: 'fixed',
-        left: '3%',
-        top: '3%',
+        left: '1.5%',
+        top: '1.5%',
         transform: 'translateX(-50%)',
+        zIndex: '1',
       }, '1. Situation in the domain'));
 
       state = {};
@@ -27,7 +28,6 @@ export default createThreeSlide({
         width: '94vw',
         height: '62vh',
         overflow: 'hidden',
-        color: '#666',
       });
 
       state.panel = panel;
@@ -41,7 +41,6 @@ export default createThreeSlide({
         fontSize: '2.35vw',
         fontWeight: '800',
         letterSpacing: '0.05vw',
-        color: 'white',
       }, 'Execution timeline: Tasks A → B → C');
 
       state.title = title;
@@ -122,7 +121,7 @@ export default createThreeSlide({
       function addLine(styles, parent = idealLayer) {
         const line = el('div', {
           position: 'absolute',
-          background: '#666',
+          background: '#000000',
           ...styles,
         });
 
@@ -135,7 +134,6 @@ export default createThreeSlide({
           position: 'absolute',
           fontSize: '1.35vw',
           fontWeight: '700',
-          color: '#666',
           ...styles,
         }, text);
 
@@ -143,7 +141,7 @@ export default createThreeSlide({
         return label;
       }
 
-      function addArrowHead(left, top, rotation = 0, color = '#666', parent = idealLayer) {
+      function addArrowHead(left, top, rotation = 0, color = '#000', parent = idealLayer) {
         const head = el('div', {
           position: 'absolute',
           left: vw(left),
@@ -317,7 +315,7 @@ export default createThreeSlide({
       function addLine(styles, parent = realLayer) {
         const line = el('div', {
           position: 'absolute',
-          background: '#666',
+          background: '#000000',
           ...styles,
         });
 
@@ -330,7 +328,7 @@ export default createThreeSlide({
           position: 'absolute',
           fontSize: '1.35vw',
           fontWeight: '700',
-          color: '#666',
+          color: '#000000',
           ...styles,
         }, text);
 
@@ -338,7 +336,7 @@ export default createThreeSlide({
         return label;
       }
 
-      function addArrowHead(left, top, rotation = 0, color = '#666', parent = realLayer) {
+      function addArrowHead(left, top, rotation = 0, color = '#000000', parent = realLayer) {
         const head = el('div', {
           position: 'absolute',
           left: vw(left),

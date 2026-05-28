@@ -12,12 +12,10 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 16px 24px;
+  padding: 25px 24px;
 
-  color: white;
-  font-size: 16px;
-
-  z-index: 10;
+  color: rgb(255, 255, 255);
+  font-size: 20px;
 }
 
 .slide-progress-bar {

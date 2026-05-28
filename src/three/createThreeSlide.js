@@ -33,7 +33,7 @@ function createThreeSlide({
     htmlRoot.style.pointerEvents = 'none';
     htmlRoot.style.boxSizing = 'border-box';
     htmlRoot.style.padding = '92px 72px 72px';
-    htmlRoot.style.color = 'white';
+    htmlRoot.style.color = 'black';
     htmlRoot.style.transition = 'opacity 350ms ease';
     htmlRoot.style.opacity = '1';
 
@@ -96,22 +96,23 @@ function createThreeSlide({
         fill = 'rgba(234, 242, 255, 0.96)',
         minHeight = '130px',
         textColor = 'rgb(24, 26, 29)',
+        borderColor = 'rgba(234, 242, 255, 0.96)',
       } = options;
 
       const card = createElement('div', {
         background: fill,
         color: textColor,
-        border: '2px solid rgb(0, 191, 255)',
+        border: '2px solid',
+        borderColor: borderColor,
         borderRadius: '18px',
         padding: '22px',
         minHeight,
-        boxShadow: '0 18px 45px rgba(0, 0, 0, 0.22)',
         boxSizing: 'border-box',
       });
 
       const heading = createElement('h3', {
         margin: '0 0 12px',
-        color: 'rgb(23, 74, 156)',
+        color: borderColor,
         fontSize: '24px',
       }, title);
 
