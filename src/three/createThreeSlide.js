@@ -113,11 +113,11 @@ function createThreeSlide({
       const heading = createElement('h3', {
         margin: '0 0 12px',
         color: borderColor,
-        fontSize: '24px',
+        fontSize: '30px',
       }, title);
 
       const content = createElement('div', {
-        fontSize: '19px',
+        fontSize: '25px',
         lineHeight: '1.42',
       });
 

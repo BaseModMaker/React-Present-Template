@@ -20,7 +20,7 @@ export default createThreeSlide({
         'Prototype: a practical implementation of restart-on-preemption.',
         'Measurements: experimental data on restart overhead, latency, WCRT, and jitter.',
         'Evaluation: comparison between theoretical expectations and real system behavior.',
-      ], { fill: 'rgb(246, 250, 255)' }));
+      ], { fill: 'rgb(246, 250, 255)', borderColor: 'rgb(91, 140, 201)' }));
 
       layout.appendChild(el('div', {
         padding: '28px',
