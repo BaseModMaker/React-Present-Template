@@ -1,25 +1,88 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import SharedSlideUI, { backgroundColor, fontFamily } from './slides/_SharedSlideUI_.js';
 import usePresentationInputs from './inputs.js';
 import useUrlSlideSync, { getSlideIndexFromUrl } from './urlSlideSync.js';
 
-const slideContext = require.context('./slides', false, /\.js$/);
+const slideContext = require.context('./slides', false, /^\.\/\d+\.js$/);
 
 const slides = slideContext
   .keys()
-  .filter((path) => path !== './_SharedSlideUI_.js')
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  .map((path) => slideContext(path).default);
+  .map((path) => {
+    const SlideComponent = slideContext(path).default;
+
+    return {
+      path,
+      Component: SlideComponent,
+      steps: SlideComponent.steps || 1,
+    };
+  });
+
+const publicPath = process.env.PUBLIC_URL || '';
+const SLIDE_TRANSITION_MS = 500;
+
+function getPublicUrl(path) {
+  const base = publicPath.replace(/\/$/, '');
+  const cleanPath = path.replace(/^\//, '');
+
+  return `${base}/${cleanPath}`;
+}
+
+function hydrateSlideImages(root) {
+  const images = Array.from(root.querySelectorAll('img'));
+
+  images.forEach((image) => {
+    if (image.getAttribute('src')) {
+      return;
+    }
+
+    const imageName = image.dataset.src || image.dataset.image || image.id;
+
+    if (!imageName) {
+      return;
+    }
+
+    const hasExtension = /\.[a-z0-9]+$/i.test(imageName);
+    const fileName = hasExtension ? imageName : `${imageName}.png`;
+
+    image.src = getPublicUrl(fileName);
+
+    image.onerror = () => {
+      const fallbackName = fileName.replaceAll('-', '_');
+
+      if (fallbackName !== fileName) {
+        image.onerror = null;
+        image.src = getPublicUrl(fallbackName);
+      }
+    };
+  });
+}
+
+function getLastStepIndex(slideIndex) {
+  const stepCount = slides[slideIndex]?.steps || 1;
+  return Math.max(0, stepCount - 1);
+}
 
 function App() {
   const containerRef = useRef(null);
-  const currentSlideControllerRef = useRef(null);
   const isTransitioningRef = useRef(false);
+  const pendingStepIndexRef = useRef(0);
 
-  const [slideIndex, setSlideIndex] = useState(() =>
-    getSlideIndexFromUrl(slides.length)
-  );
+  const initialSlideIndex = getSlideIndexFromUrl(slides.length);
+
+  const [slideIndex, setSlideIndex] = useState(initialSlideIndex);
+  const [renderedSlideIndex, setRenderedSlideIndex] = useState(initialSlideIndex);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
+
+  const renderedSlide = slides[renderedSlideIndex];
+
+  const CurrentSlide = useMemo(() => {
+    return renderedSlide?.Component || null;
+  }, [renderedSlide]);
+
+  const currentStepCount = renderedSlide?.steps || 1;
 
   useEffect(() => {
     const previousHtmlBackground = document.documentElement.style.backgroundColor;
@@ -38,106 +101,109 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (currentSlideControllerRef.current?.cleanup) {
-      currentSlideControllerRef.current.cleanup();
-      currentSlideControllerRef.current = null;
-    }
-
-    const slide = slides[slideIndex];
-
-    if (slide && containerRef.current) {
-      currentSlideControllerRef.current = slide(containerRef.current);
-    }
-
-    return () => {
-      if (currentSlideControllerRef.current?.cleanup) {
-        currentSlideControllerRef.current.cleanup();
-        currentSlideControllerRef.current = null;
-      }
-    };
-  }, [slideIndex]);
-
-  useUrlSlideSync({
-    slideIndex,
-    setSlideIndex,
-    totalSlides: slides.length,
-  });
-
-  async function goNext() {
-    if (isTransitioningRef.current) return;
-
-    const currentSlide = currentSlideControllerRef.current;
-
-    if (currentSlide?.nextStep) {
-      const handledBySlide = currentSlide.nextStep();
-
-      if (handledBySlide) {
-        return;
-      }
-    }
-
-    if (slideIndex >= slides.length - 1) {
+    if (!containerRef.current) {
       return;
+    }
+
+    hydrateSlideImages(containerRef.current);
+  }, [renderedSlideIndex]);
+
+  useEffect(() => {
+    if (slideIndex === renderedSlideIndex) {
+      return undefined;
+    }
+
+    if (isTransitioningRef.current) {
+      return undefined;
     }
 
     isTransitioningRef.current = true;
+    setIsExiting(true);
 
-    if (currentSlide?.exit) {
-      await currentSlide.exit();
-      currentSlideControllerRef.current = null;
+    const timeoutId = window.setTimeout(() => {
+      setRenderedSlideIndex(slideIndex);
+      setStepIndex(pendingStepIndexRef.current);
+      setIsExiting(false);
+      isTransitioningRef.current = false;
+    }, SLIDE_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      isTransitioningRef.current = false;
+    };
+  }, [slideIndex, renderedSlideIndex]);
+
+  useUrlSlideSync({
+    slideIndex,
+    setSlideIndex: (nextSlideIndex) => {
+      pendingStepIndexRef.current = 0;
+      setSlideIndex(nextSlideIndex);
+    },
+    totalSlides: slides.length,
+  });
+
+  function goToSlide(nextSlideIndex, nextStepIndex = 0) {
+    if (isTransitioningRef.current) {
+      return;
     }
 
-    setSlideIndex((current) => Math.min(current + 1, slides.length - 1));
+    const clampedSlideIndex = Math.max(
+      0,
+      Math.min(nextSlideIndex, slides.length - 1)
+    );
 
-    isTransitioningRef.current = false;
+    const clampedStepIndex = Math.max(
+      0,
+      Math.min(nextStepIndex, getLastStepIndex(clampedSlideIndex))
+    );
+
+    if (clampedSlideIndex === slideIndex) {
+      setStepIndex(clampedStepIndex);
+      return;
+    }
+
+    pendingStepIndexRef.current = clampedStepIndex;
+    setSlideIndex(clampedSlideIndex);
+  }
+
+  function goNext() {
+    if (isTransitioningRef.current) {
+      return;
+    }
+
+    if (stepIndex < currentStepCount - 1) {
+      setStepIndex((current) => current + 1);
+      return;
+    }
+
+    goToSlide(slideIndex + 1, 0);
   }
 
   function goPrevious() {
-    const currentSlide = currentSlideControllerRef.current;
-
-    if (currentSlide?.previousStep) {
-      const handledBySlide = currentSlide.previousStep();
-
-      if (handledBySlide) {
-        return;
-      }
+    if (isTransitioningRef.current) {
+      return;
     }
 
-    setSlideIndex((current) => Math.max(current - 1, 0));
+    if (stepIndex > 0) {
+      setStepIndex((current) => current - 1);
+      return;
+    }
+
+    const previousSlideIndex = slideIndex - 1;
+
+    if (previousSlideIndex < 0) {
+      return;
+    }
+
+    goToSlide(previousSlideIndex, getLastStepIndex(previousSlideIndex));
   }
 
   function goNextSlide() {
-    if (isTransitioningRef.current) return;
-
-    if (slideIndex >= slides.length - 1) {
-      return;
-    }
-
-    const currentSlide = currentSlideControllerRef.current;
-
-    if (currentSlide?.cleanup) {
-      currentSlide.cleanup();
-      currentSlideControllerRef.current = null;
-    }
-
-    setSlideIndex((current) => Math.min(current + 1, slides.length - 1));
+    goToSlide(slideIndex + 1, 0);
   }
 
   function goPreviousSlide() {
-    if (isTransitioningRef.current) return;
-
-    if (slideIndex <= 0) {
-      return;
-    }
-
-    const currentSlide = currentSlideControllerRef.current;
-
-    if (currentSlide?.cleanup) {
-      currentSlide.cleanup();
-      currentSlideControllerRef.current = null;
-    }
-
-    setSlideIndex((current) => Math.max(current - 1, 0));
+    goToSlide(slideIndex - 1, 0);
   }
 
   usePresentationInputs({
@@ -149,7 +215,11 @@ function App() {
 
   return (
     <div className="App">
-      <div ref={containerRef} className="slide-container" />
+      <div ref={containerRef} className="slide-container">
+        <div className={`slide-renderer ${isExiting ? 'is-exiting' : ''}`}>
+          {CurrentSlide ? <CurrentSlide step={stepIndex} /> : null}
+        </div>
+      </div>
 
       <SharedSlideUI
         currentSlide={slideIndex + 1}

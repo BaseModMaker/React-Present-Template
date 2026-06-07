@@ -1,54 +1,112 @@
-import createThreeSlide from '../three/createThreeSlide.js';
+import { useEffect, useRef } from 'react';
+import Plotly from 'plotly.js-dist-min';
 
-export default createThreeSlide({
-  steps: [
-    ({ el, addHtml, image }) => {
-      const publicPath = process.env.PUBLIC_URL || '';
-      const seal = image(`${publicPath}/ulb_seal.png`, {
-        position: 'absolute',
-        right: '-200px',
-        bottom: '-220px',
-        width: '920px',
-        height: '920px',
-        maxWidth: '920px',
-        maxHeight: '920px',
-        opacity: '1',
-        transform: 'rotate(-45deg)',
-      });
+function PlotlyDivider() {
+  const dividerRef = useRef(null);
 
-      addHtml(seal, undefined, { fadeIn: false });
+  useEffect(() => {
+    const divider = dividerRef.current;
 
-      addHtml(el('h1', {
-        maxWidth: '980px',
-        margin: '0',
-        fontSize: '52px',
-        lineHeight: '1.02',
-      }, 'Practical Evaluation of the Non-Resumable Model'));
+    if (!divider) {
+      return undefined;
+    }
 
-      addHtml(el('div', {
-        marginTop: '18px',
-        fontSize: '28px',
-        opacity: '0.88',
-      }, 'A feasibility study on real operating systems and hardware'));
+    Plotly.newPlot(
+      divider,
+      [
+        {
+          x: [0, 1],
+          y: [0, 0],
+          mode: 'lines',
+          line: {
+            color: '#3059ab',
+            width: 6,
+          },
+          hoverinfo: 'skip',
+        },
+      ],
+      {
+        margin: { l: 0, r: 0, t: 0, b: 0 },
+        xaxis: {
+          visible: false,
+          fixedrange: true,
+        },
+        yaxis: {
+          visible: false,
+          fixedrange: true,
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        height: 24,
+      },
+      {
+        displayModeBar: false,
+        responsive: true,
+      }
+    );
 
-      addHtml(el('div', {
-        width: '100%',
-        height: '3px',
-        margin: '28px 0',
-        // background: 'rgb(0, 191, 255)',
-        background: '#3059ab',
-      }));
+    return () => {
+      Plotly.purge(divider);
+    };
+  }, []);
 
-      addHtml(el('div', {
-        fontSize: '24px',
-        marginTop: '18px',
-      }, 'Basile Donnay'));
+  return (
+    <div
+      ref={dividerRef}
+      className="accent-line"
+      aria-hidden="true"
+    />
+  );
+}
 
-      addHtml(el('div', {
-        fontSize: '20px',
-        color: '#3059ab',
-        marginTop: '10px',
-      }, 'Supervisor: Joël Goossens — MEMO-F-403'));
-    },
-  ],
-});
+export default function Slide1() {
+  return (
+    <div className="slide slide-center">
+      <img id="ulb-seal" className="ulb-seal" alt="" />
+
+      <main className="slide-content">
+        <h1>Practical Evaluation of the Non-Resumable Model</h1>
+
+        <p className="subtitle">
+          A feasibility study on real operating systems and hardware
+        </p>
+
+        <PlotlyDivider />
+
+        <p className="author">Basile Donnay</p>
+
+        <p className="supervisor">
+          Supervisor: Joël Goossens — MEMO-F-403
+        </p>
+      </main>
+
+      <style>{`
+        .ulb-seal {
+          position: absolute;
+          right: -200px;
+          bottom: -220px;
+          width: 920px;
+          height: 920px;
+          max-width: 920px;
+          max-height: 920px;
+          opacity: 1;
+          transform: rotate(-45deg);
+          object-fit: contain;
+          pointer-events: none;
+          user-select: none;
+        }
+
+        .author {
+          margin: 18px 0 0;
+          font-size: 24px;
+        }
+
+        .supervisor {
+          margin: 10px 0 0;
+          font-size: 20px;
+          color: #3059ab;
+        }
+      `}</style>
+    </div>
+  );
+}
